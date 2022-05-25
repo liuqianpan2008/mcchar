@@ -17,6 +17,12 @@ wss.on("connection", (ws) => {
   seedMessage.mag = "连接成功！";
   ws.send(JSON.stringify(seedMessage));
   console.log("通信成功");
+  ws.on("close", function close() {
+    if (bot) {
+      console.log("客户离开,玩家下线！");
+      bot.quit();
+    }
+  });
   //监听通信
   ws.on("message", (message) => {
     console.log("客户端信息：" + message);
