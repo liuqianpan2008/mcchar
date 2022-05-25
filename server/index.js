@@ -9,9 +9,10 @@ const seedMessage = {
   date: null,
   mag: "",
 };
+
 wss.on("connection", (ws) => {
-  //通信成功！
   let bot = null;
+  //通信成功！
   seedMessage.tape = "connection";
   seedMessage.mag = "连接成功！";
   ws.send(JSON.stringify(seedMessage));
@@ -37,24 +38,34 @@ wss.on("connection", (ws) => {
       bot.chat(res.date ?? "");
     }
     if (res.tape == "create") {
+      const util = require("minecraft-server-util");
+      if (res.date.port) {
+        res.date.port = util.parseAddress(res.date.host).port;
+      }
       if (res.date.password) {
         bot = mineflayer.createBot({
           host: res.date.host,
           port: res.date.port,
           username: res.date.username, // minecraft username
-          password: res.date.password ?? "",
+          password: res.date.password,
           auth: "microsoft", // minecraft password, comment out if you want to log into online-mode=false servers
         });
+      } else {
+        console.log("为提供密码,准备盗版登录");
+        bot = mineflayer.createBot({
+          host: "127.0.0.1",
+          port: "25565",
+          username: "text", // minecraft username
+        });
       }
-
-      bot.on("login", () => {
+      bot?.on("login", () => {
         seedMessage.tape = "login";
         seedMessage.mag = "登录" + res.date.host + "服务器成功";
         console.log("发出数据===>\n" + JSON.stringify(seedMessage));
         ws.send(JSON.stringify(seedMessage));
       });
 
-      bot.on("chat", (username, message) => {
+      bot?.on("chat", (username, message) => {
         seedMessage.tape = "chat";
         seedMessage.mag = "收到消息";
         seedMessage.date = { user: username, meg: message };
@@ -71,14 +82,14 @@ wss.on("connection", (ws) => {
         ws.send(JSON.stringify(seedMessage));
       });
 			*/
-      bot.on("kicked", (reason) => {
+      bot?.on("kicked", (reason) => {
         seedMessage.tape = "kicked";
         seedMessage.mag = "服务器被踢出";
         seedMessage.date = reason;
         console.log("发出数据===>\n" + JSON.stringify(seedMessage));
         ws.send(JSON.stringify(seedMessage));
       });
-      bot.on("error", (err) => {
+      bot?.on("error", (err) => {
         seedMessage.tape = "error";
         seedMessage.mag = "出现错误";
         seedMessage.date = err.message;

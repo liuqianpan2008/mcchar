@@ -12,6 +12,7 @@
   "author": "枫叶秋林",
   "license": "ISC",
   "dependencies": {
+    "minecraft-server-util": "^5.2.9",
     "mineflayer": "^4.3.0",
     "ws": "^8.6.0"
   }

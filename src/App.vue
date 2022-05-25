@@ -140,19 +140,9 @@ const rules = {
     message: '请输入服务器地址',
     trigger: 'blur'
   },
-  port: {
-    required: true,
-    message: '请输入端口',
-    trigger: 'blur'
-  },
   username: {
     required: true,
     message: '请输入账号',
-    trigger: 'blur'
-  },
-  password: {
-    required: true,
-    message: '请输入密码',
     trigger: 'blur'
   },
 }
@@ -211,11 +201,12 @@ const lj = () => {
       }, false)
       WS.addEventListener('close', function (e) {
         console.log("WS close", e);
+        ljloading.value = false;
       }, false)
       WS.addEventListener('error', function (e) {
         console.log("WS error", e);
+        ljloading.value = false;
       }, false)
-
     }
   })
 }
