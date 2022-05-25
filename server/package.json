@@ -1,0 +1,18 @@
+{
+  "name": "mcbot",
+  "version": "1.0.0",
+  "description": "我的世界机器人",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "bot"
+  ],
+  "author": "枫叶秋林",
+  "license": "ISC",
+  "dependencies": {
+    "mineflayer": "^4.3.0",
+    "ws": "^8.6.0"
+  }
+}
