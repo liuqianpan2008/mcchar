@@ -53,9 +53,9 @@ wss.on("connection", (ws) => {
       } else {
         console.log("为提供密码,准备盗版登录");
         bot = mineflayer.createBot({
-          host: "127.0.0.1",
-          port: "25565",
-          username: "text", // minecraft username
+          host: res.date.host,
+          port: res.date.port,
+          username: res.date.username, // minecraft username
         });
       }
       bot?.on("login", () => {
