@@ -59,6 +59,12 @@ wss.on("connection", (ws) => {
       };
       ws.send(JSON.stringify(seedMessage));
     }
+    if (res.tape == "quit") {
+      seedMessage.tape = "quit";
+      seedMessage.mag = "机器人已下线";
+      seedMessage.date = null;
+      bot.quit();
+    }
     if (res.tape == "create") {
       const util = require("minecraft-server-util");
       if (res.date.port) {

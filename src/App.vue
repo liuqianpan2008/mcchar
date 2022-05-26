@@ -118,10 +118,10 @@
                      type="textarea"
                      placeholder="请输入内容" />
             <n-space justify="end">
-              <n-button type="success"
+              <n-button type="error"
                         @click="quitWS"
                         :disabled="!setupdisabled">
-                关闭
+                断开
               </n-button>
               <n-button type="success"
                         @click="seedc"
@@ -239,6 +239,12 @@ const lj = () => {
           console.log(JSON.stringify(seedMessage).toString());
           WS.send(JSON.stringify(seedMessage).toString())
           seedchar.value = ""
+        }
+        quitWS.value = () => {
+          seedMessage.tape = "quit"
+          WS.send(JSON.stringify(seedMessage).toString())
+          setupdisabled.value = false;
+          showModal.value = true;
         }
       }, false)
       WS.addEventListener('close', function (e) {
