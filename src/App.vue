@@ -244,7 +244,7 @@ const lj = () => {
           seedMessage.tape = "quit"
           WS.send(JSON.stringify(seedMessage).toString())
           setupdisabled.value = false;
-          showModal.value = true;
+
         }
       }, false)
       WS.addEventListener('close', function (e) {

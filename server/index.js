@@ -64,6 +64,7 @@ wss.on("connection", (ws) => {
       seedMessage.mag = "机器人已下线";
       seedMessage.date = null;
       bot.quit();
+      ws.send(JSON.stringify(seedMessage));
     }
     if (res.tape == "create") {
       const util = require("minecraft-server-util");
