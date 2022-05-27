@@ -143,6 +143,12 @@
               </n-button>
             </n-space>
           </n-card>
+          <n-card>
+            <iframe :src="'http://'+formValue.ws+':3007'"
+                    scrolling="auto"
+                    frameborder="0"
+                    style="width: 100%;height: 100px;"></iframe>
+          </n-card>
         </n-layout-sider>
         <!-- 主聊天区 -->
         <n-layout-content bordered
@@ -152,7 +158,7 @@
               <n-card v-for="(mag,i) in mags"
                       :key="i"
                       :title="mag.username"
-                      :header-style="mag.username=='系统'?'color: red':''">
+                      :content-style="mag.username=='系统'?'color=red':''">
                 <template #header-extra>
                   <n-time :time="mag.time" />
                 </template>
@@ -201,7 +207,7 @@ var seedc = ref(null)
 const seedchar = ref("")
 const formRef = ref()
 const formValue = ref({
-  ws: "127.0.0.1:3000",
+  ws: "127.0.0.1",
   host: "",
   port: "",
   username: "",
@@ -259,7 +265,7 @@ const lj = () => {
     if (!errors) {
       console.log('验证通过')
       ljloading.value = true;
-      const WS = new WebSocket("ws://" + formValue.value.ws)
+      const WS = new WebSocket("ws://" + formValue.value.ws + ":3000")
       const seedMessage = {
         tape: "",
         date: null,

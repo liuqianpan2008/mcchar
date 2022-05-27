@@ -184,6 +184,7 @@ wss.on("connection", (ws) => {
         ws.send(JSON.stringify(seedMessage));
         // 视图插件
         mineflayerViewer(bot, { port: 3007, firstPerson: true });
+        // 防止afk
       });
       // 聊天事件监听
       bot?.on("chat", (username, message) => {
