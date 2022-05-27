@@ -67,13 +67,16 @@
                 </n-form-item>
               </n-form>
             </n-modal>
+            <!-- 屏蔽关闭，编译web端 -->
             <n-button type="error"
                       @click="quit">
               关闭
             </n-button>
+            <!--  -->
           </n-space>
         </n-space>
       </n-layout-header>
+      <!-- 聊天区 -->
       <n-layout has-sider
                 position="absolute"
                 style="top: 60px; bottom: 145px">
@@ -83,13 +86,65 @@
                         :width="240"
                         show-trigger="arrow-circle"
                         content-style="padding: 24px;"
-                        bordered>
+                        bordered
+                        :native-scrollbar="false">
           <n-card title="个人信息">
             饱食度：{{info.food}}<br>
             生命力：{{info.health}}<br>
             <!--疑似BUG 氧气:{{info.oxy}} -->
           </n-card>
+          <!-- 服务器信息查询 -->
+          <n-card title="服务器信息"
+                  embedded>
+            <template #trigger>
+              <div>
+                <n-space>
+                  <n-tag>延迟：{{serverInfo.roundTripLatency}}</n-tag>
+                  <n-tag>在线人数：{{serverInfo.players.online}}/{{resdate.players.max}}</n-tag>
+                </n-space>
+              </div>
+            </template>
+            <n-space justify="space-between">
+              <n-image width="100"
+                       :src="serverInfo.favicon" />
+              <n-card>
+                <div v-html="serverInfo.motd.html"></div>
+              </n-card>
+            </n-space>
+            <!-- {{serverInfo}} -->
+          </n-card>
+          <n-card title="操作">
+            <!-- getEntityAll -->
+            <n-radio-group v-model:value="Entity"
+                           name="radiogroup">
+              <n-radio v-for="(EntityAll,i) in EntityAllinfo"
+                       :key="i"
+                       :value="EntityAll"
+                       v-show="EntityAll.username">
+                {{ EntityAll.username }}
+              </n-radio>
+
+            </n-radio-group>
+            <n-space vertical>
+              <n-button type="success"
+                        @click="getEntityAll"
+                        :disabled="!setupdisabled">
+                获取附近全部实体
+              </n-button>
+              <n-button type="success"
+                        @click="Movements"
+                        :disabled="!setupdisabled || !Entity">
+                移动至所选实体
+              </n-button>
+              <n-button type="success"
+                        @click="attack"
+                        :disabled="!setupdisabled || !Entity">
+                攻击所选实体
+              </n-button>
+            </n-space>
+          </n-card>
         </n-layout-sider>
+        <!-- 主聊天区 -->
         <n-layout-content bordered
                           :native-scrollbar="false">
           <n-card hoverable>
@@ -138,7 +193,6 @@
 
 <script setup>
 import { ref } from "@vue/reactivity";
-const { ipcRenderer } = window.require('electron')
 const quitWS = ref()
 const setupdisabled = ref(false)
 const showModal = ref(false)
@@ -180,6 +234,25 @@ const info = ref({
   food: 0,
   oxy: 0,
 })
+const getEntityAll = ref()
+const EntityAllinfo = ref([])
+const Movements = ref()
+const Entity = ref()
+const attack = ref()
+const serverInfo = ref({
+  version: {
+    name: "未知"
+  },
+  favicon: null,
+  motd: { html: "未知" },
+  roundTripLatency: 999999,
+  players: {
+    online: 0,
+    max: 0,
+    sample: null,
+    list: []
+  },
+})
 // 连接按钮事件
 const lj = () => {
   formRef.value?.validate((errors) => {
@@ -210,9 +283,19 @@ const lj = () => {
             setupdisabled.value = true;
             showModal.value = false;
           }
+          // bot状态
           if (res.tape == "info") {
             info.value = res.date
             return;
+          }
+          if (res.tape == "serverInfo") {
+            serverInfo.value = res.date
+            return;
+          }
+          if (res.tape == "Entity") {
+            EntityAllinfo.value = res.date
+            console.log("获取到实体：" + EntityAllinfo.value);
+            return
           }
           mags.value.push({
             username: "系统",
@@ -240,11 +323,30 @@ const lj = () => {
           WS.send(JSON.stringify(seedMessage).toString())
           seedchar.value = ""
         }
+        // 主动退出按钮
         quitWS.value = () => {
           seedMessage.tape = "quit"
           WS.send(JSON.stringify(seedMessage).toString())
           setupdisabled.value = false;
 
+        }
+        // 获取实体按钮
+        getEntityAll.value = () => {
+          seedMessage.tape = "Entity"
+          WS.send(JSON.stringify(seedMessage).toString())
+        }
+        // 移动按钮
+        Movements.value = () => {
+          console.log(Entity.value);
+          seedMessage.tape = "Movements"
+          seedMessage.date = Entity.value.position
+          WS.send(JSON.stringify(seedMessage).toString())
+        }
+        //攻击按钮
+        attack.value = () => {
+          seedMessage.tape = "attack"
+          seedMessage.date = Entity.value.id
+          WS.send(JSON.stringify(seedMessage).toString())
         }
       }, false)
       WS.addEventListener('close', function (e) {
@@ -258,9 +360,12 @@ const lj = () => {
     }
   })
 }
+// 屏蔽下面代码,改成web端
+const { ipcRenderer } = window.require('electron')
 function quit () {
   ipcRenderer.send("close")
 }
+
 </script>
 
 <style>
